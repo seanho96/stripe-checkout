@@ -11,18 +11,25 @@ const getStripe = () => {
 };
 
 const Main = styled.main`
-  font-family: "-apple-system, Roboto, sans-serif, serif";
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   padding: 96;
   color: "#232129";
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
 `;
 
 const SuccessHeader = styled.h2`
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.6rem;
   color: darkolivegreen;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+`;
+
+const CanceledHeader = styled.h2`
+  text-align: center;
+  font-size: 1.6rem;
+  color: darksalmon;
 `;
 
 const Button = styled.button`
@@ -33,9 +40,36 @@ const Button = styled.button`
   background-color: blanchedalmond;
 `;
 
+const Loader = styled.div`
+  animation: rotate 2s infinite ease;
+  margin: auto;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #cce6f4;
+  border-top-color: #003844;
+  border-right-color: #ffb100;
+  border-bottom-color: #006c67;
+  border-left-color: #f194b4;
+  border-radius: 50%;
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    10% {
+      transform: rotate(-45deg);
+    }
+    100% {
+      transform: rotate(720deg);
+    }
+  }
+`;
+
 // markup
 const IndexPage = () => {
   const [status, setStatus] = React.useState("idle");
+  const [isLoading, setLoading] = React.useState(false);
+
   React.useEffect(() => {
     // Check to see if this is a redirect back from Checkout
     const query = new URLSearchParams(window.location.search);
@@ -47,12 +81,13 @@ const IndexPage = () => {
   }, []);
 
   const data = {
-    sku: 12312312,
+    sku: 123,
     quantity: 1,
   };
 
   const handleFormSubmission = async (event) => {
     event.preventDefault();
+    setLoading(true);
     const stripe = await getStripe();
 
     const response = await fetch("/.netlify/functions/stripe-checkout", {
@@ -67,6 +102,8 @@ const IndexPage = () => {
       sessionId: response.sessionId,
     });
 
+    setLoading(false);
+
     if (error) {
       console.error(error);
     }
@@ -74,11 +111,19 @@ const IndexPage = () => {
 
   return (
     <Main>
-      {status === "success" ? (
+      {status === "success" && (
         <SuccessHeader>You have successfully paid for the order.</SuccessHeader>
+      )}
+      {status === "canceled" && (
+        <CanceledHeader>
+          The payment was cancelled. Please try again.
+        </CanceledHeader>
+      )}
+      {isLoading ? (
+        <Loader />
       ) : (
         <form onSubmit={handleFormSubmission}>
-          <Button type="submit">Checkout</Button>
+          {status !== "success" && <Button type="submit">Checkout</Button>}
         </form>
       )}
     </Main>

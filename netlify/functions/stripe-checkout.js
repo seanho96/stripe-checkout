@@ -1,12 +1,12 @@
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-exports.handler = async (event, context) => {
+exports.handler = async () => {
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       success_url: `${process.env.URL}/?success=true`,
-      cancel_url: `${process.env.URL}?canceled=true`,
+      cancel_url: `${process.env.URL}/?canceled=true`,
       line_items: [
         {
           name: "This Pretty Plant",
@@ -26,8 +26,7 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       body: JSON.stringify({
         sessionId: session.id,
-        publishableKey:
-          "sk_test_51KKMFdEcSF9gwTBnhL8TvbBm7VLJyiDqMrSX53cCSeYowa82AFzUneczMW7sL5FQzFEXSW3kMR3yyuPrrh6vBlFz00hO5nj7jk",
+        publishableKey: process.env.GATSBY_STRIPE_PUBLISHABLE_KEY,
       }),
     };
   } catch (err) {
