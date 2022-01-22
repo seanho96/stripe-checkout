@@ -15,11 +15,14 @@
     "clean": "gatsby clean"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^1.22.0",
     "babel-plugin-styled-components": "^2.0.2",
+    "dotenv": "^14.2.0",
     "gatsby": "^4.5.4",
     "gatsby-plugin-styled-components": "^5.5.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "stripe": "^8.199.0",
     "styled-components": "^5.3.3"
   }
 }
